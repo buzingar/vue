@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>keep-alive</title>
+  </head>
+  <body>
+    <div id="app">
+      <button @click="switchComp('child1')">组件1</button>
+      <button @click="switchComp('child2')">组件2</button>
+      <button @click="switchComp('child3')">组件3</button>
+
+      <!-- <keep-alive>
+        <component :is="chooseComponent"></component>
+      </keep-alive> -->
+
+      <!-- 逗号分隔字符串 -->
+      <!-- <keep-alive include="child1,child2">
+        <component :is="chooseComponent"></component>
+      </keep-alive> -->
+
+      <!-- 正则表达式 (使用 `v-bind`) -->
+      <keep-alive :include="/child*/">
+        <component :is="chooseComponent"></component>
+      </keep-alive>
+
+      <!-- 数组 (使用 `v-bind`) -->
+      <!-- <keep-alive :include="['child2', 'child3']">
+        <component :is="chooseComponent"></component>
+      </keep-alive> -->
+
+      <!-- 一旦这个数字达到了，在新实例被创建之前，已缓存组件中最久没有被访问的实例会被销毁掉 -->
+      <!-- <keep-alive :max="10">
+        <component :is="chooseComponent"></component>
+      </keep-alive> -->
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script>
+      // Vue 提供了 activated和deactivated 两个钩子函数，它的执行时机是 <keep-alive> 包裹的组件激活时调用和停用时调用
+      // 1. 匹配时首先检查组件自身的 name 选项
+      var child1 = {
+        template: '<div>组件1:<input type="text"/></div>',
+        name: "child1",
+        mounted() {
+          console.log("Comp A mounted");
+        },
+        activated() {
+          console.log("Comp A activated");
+        },
+        deactivated() {
+          console.log("Comp A deactivated");
+        },
+      };
+      var child2 = {
+        template: '<div>组件2:<input type="text"/></div>',
+        name: "child2",
+        mounted() {
+          console.log("Comp B mounted");
+        },
+        activated() {
+          console.log("Comp B activated");
+        },
+        deactivated() {
+          console.log("Comp B deactivated");
+        },
+      };
+      var child3 = {
+        template: '<div>组件3:<input type="text"/></div>',
+      };
+      var vm = new Vue({
+        el: "#app",
+        components: {
+          // 2. name不可用，则匹配它的局部注册名称 (父组件 components 选项的键值)，也就是组件的标签值
+          child1,
+          child2,
+          child3,
+        },
+        data() {
+          return {
+            chooseComponent: "child1",
+          };
+        },
+        methods: {
+          switchComp(component) {
+            this.chooseComponent = component;
+          },
+        },
+      });
+    </script>
+  </body>
+</html>
